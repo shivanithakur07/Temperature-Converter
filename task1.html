@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temperature Converter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles */
+        .converter-container {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        .input-field {
+            transition: all 0.3s ease;
+        }
+        .input-field:focus {
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+            border-color: #3b82f6;
+        }
+        .scale-btn {
+            transition: all 0.2s ease;
+        }
+        .scale-btn:hover {
+            transform: translateY(-2px);
+        }
+        .scale-btn.active {
+            background-color: #3b82f6;
+            color: white;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+    <div class="converter-container p-8 max-w-md w-full">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">Temperature Converter</h1>
+            <p class="text-gray-600">Convert between Celsius, Fahrenheit, and Kelvin</p>
+        </div>
+
+        <div class="mb-6">
+            <div class="flex justify-center space-x-2 mb-4">
+                <button id="celsius-btn" class="scale-btn px-4 py-2 rounded-full bg-white text-blue-500 font-medium border border-gray-300 active">°C</button>
+                <button id="fahrenheit-btn" class="scale-btn px-4 py-2 rounded-full bg-white text-blue-500 font-medium border border-gray-300">°F</button>
+                <button id="kelvin-btn" class="scale-btn px-4 py-2 rounded-full bg-white text-blue-500 font-medium border border-gray-300">K</button>
+            </div>
+
+            <div class="relative">
+                <input id="temperature-input" type="number" class="input-field w-full px-4 py-3 text-lg border border-gray-300 rounded-lg focus:outline-none" placeholder="Enter temperature">
+                <div id="current-scale" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 font-medium">°C</div>
+            </div>
+        </div>
+
+        <div class="results-container space-y-4">
+            <div class="result-item bg-white p-4 rounded-lg shadow-sm">
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-700">Fahrenheit</span>
+                    <span id="fahrenheit-result" class="text-xl font-bold text-gray-800">--</span>
+                </div>
+            </div>
+            <div class="result-item bg-white p-4 rounded-lg shadow-sm">
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-700">Celsius</span>
+                    <span id="celsius-result" class="text-xl font-bold text-gray-800">--</span>
+                </div>
+            </div>
+            <div class="result-item bg-white p-4 rounded-lg shadow-sm">
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-700">Kelvin</span>
+                    <span id="kelvin-result" class="text-xl font-bold text-gray-800">--</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-6 text-center">
+            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/7c432a3e-184f-4ac0-8d79-be7420135972.png" alt="Temperature scale illustration" class="rounded-lg mx-auto w-full max-w-xs" />
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputField = document.getElementById('temperature-input');
+            const currentScale = document.getElementById('current-scale');
+            const celsiusBtn = document.getElementById('celsius-btn');
+            const fahrenheitBtn = document.getElementById('fahrenheit-btn');
+            const kelvinBtn = document.getElementById('kelvin-btn');
+            const celsiusResult = document.getElementById('celsius-result');
+            const fahrenheitResult = document.getElementById('fahrenheit-result');
+            const kelvinResult = document.getElementById('kelvin-result');
+
+            let activeScale = 'celsius';
+
+            // Event listeners for scale buttons
+            celsiusBtn.addEventListener('click', () => {
+                setActiveScale('celsius', '°C');
+                convertTemperature();
+            });
+
+            fahrenheitBtn.addEventListener('click', () => {
+                setActiveScale('fahrenheit', '°F');
+                convertTemperature();
+            });
+
+            kelvinBtn.addEventListener('click', () => {
+                setActiveScale('kelvin', 'K');
+                convertTemperature();
+            });
+
+            // Event listener for input changes
+            inputField.addEventListener('input', convertTemperature);
+
+            function setActiveScale(scale, symbol) {
+                activeScale = scale;
+                currentScale.textContent = symbol;
+                
+                // Update button styles
+                celsiusBtn.classList.remove('active');
+                fahrenheitBtn.classList.remove('active');
+                kelvinBtn.classList.remove('active');
+                
+                if (scale === 'celsius') celsiusBtn.classList.add('active');
+                if (scale === 'fahrenheit') fahrenheitBtn.classList.add('active');
+                if (scale === 'kelvin') kelvinBtn.classList.add('active');
+            }
+
+            function convertTemperature() {
+                const inputValue = parseFloat(inputField.value);
+                
+                if (isNaN(inputValue)) {
+                    celsiusResult.textContent = '--';
+                    fahrenheitResult.textContent = '--';
+                    kelvinResult.textContent = '--';
+                    return;
+                }
+
+                let celsius, fahrenheit, kelvin;
+
+                switch (activeScale) {
+                    case 'celsius':
+                        celsius = inputValue;
+                        fahrenheit = (celsius * 9/5) + 32;
+                        kelvin = celsius + 273.15;
+                        break;
+                    case 'fahrenheit':
+                        fahrenheit = inputValue;
+                        celsius = (fahrenheit - 32) * 5/9;
+                        kelvin = celsius + 273.15;
+                        break;
+                    case 'kelvin':
+                        kelvin = inputValue;
+                        celsius = kelvin - 273.15;
+                        fahrenheit = (celsius * 9/5) + 32;
+                        break;
+                }
+
+                // Round to 2 decimal places for display
+                celsiusResult.textContent = celsius.toFixed(2);
+                fahrenheitResult.textContent = fahrenheit.toFixed(2);
+                kelvinResult.textContent = kelvin.toFixed(2);
+            }
+
+            // Initialize with Celsius as default
+            setActiveScale('celsius', '°C');
+        });
+    </script>
+</body>
+</html>
